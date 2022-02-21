@@ -9,7 +9,7 @@ import { defineComponent } from "vue";
 import CounterBase from "@/components/CounterBase.vue";
 
 export default defineComponent({
-  name: "ViewHome",
+  name: "Home",
   components: {
     CounterBase,
   },
