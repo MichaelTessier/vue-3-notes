@@ -11,12 +11,25 @@ const { isAuthenticated } = useAuthState();
   <header>
     <nav>
       <RouterLink to="/">Home</RouterLink>
+      <RouterLink
+        :to="{
+          name: 'notes',
+        }"
+      >
+        Notes
+      </RouterLink>
+      <RouterLink
+        :to="{
+          name: 'new-note',
+        }"
+      >
+        New Note
+      </RouterLink>
     </nav>
 
     <UserMenu v-if="isAuthenticated" />
     <AuthMenu v-if="!isAuthenticated" />
   </header>
-
   <RouterView />
 </template>
 

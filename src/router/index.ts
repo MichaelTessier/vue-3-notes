@@ -5,6 +5,7 @@ import {
 } from "vue-router";
 
 import { authRoutes } from "@/domains/auth/routes";
+import { notesRoutes } from "@/domains/notes/routes";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -13,6 +14,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/Home.vue"),
   },
   ...authRoutes,
+  ...notesRoutes,
 ];
 
 const router = createRouter({
