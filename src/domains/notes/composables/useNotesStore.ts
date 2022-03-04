@@ -2,14 +2,20 @@ import { reactive, readonly } from "vue";
 import type { Note } from "../models/Note";
 
 import { createCollection } from "@/config/firebase";
-import { getDocs, query, where } from "firebase/firestore";
+import {
+  getDocs,
+  query,
+  where,
+  doc,
+  setDoc,
+  Timestamp,
+} from "firebase/firestore";
 
 interface NotesState {
   ids: string[];
   all: Map<string, Note>;
   isLoaded: boolean;
   isError: boolean;
-  userId: string;
 }
 
 export const notesCollection = createCollection<Note>("notes");
@@ -29,27 +35,18 @@ export class NotesStore {
     return [...this.state.all.values()];
   }
 
-  async fetchNotes() {
+  async fetchNotes(userId: string) {
     try {
-      const notesQuery = query(
-        notesCollection,
-        where("userId", "==", this.state.userId)
-      );
+      const notesQuery = query(notesCollection, where("userId", "==", userId));
 
       const notes = await getDocs(notesQuery);
 
       notes.docs.forEach((doc) => {
         this.state.ids.push(doc.id);
 
-        const { title, content, createdAt, updatedAt, userId } = doc.data();
-
         this.state.all.set(doc.id, {
+          ...doc.data(),
           id: doc.id,
-          title,
-          content,
-          createdAt,
-          updatedAt,
-          userId,
         });
       });
     } catch (error) {
@@ -58,15 +55,21 @@ export class NotesStore {
       this.state.isLoaded = true;
     }
   }
+
+  async notePost(note: Note) {
+    await setDoc(doc(notesCollection), {
+      ...note,
+      createdAt: Timestamp.fromDate(new Date()),
+    });
+  }
 }
 
-export function useNotesStore(userId: string) {
+export function useNotesStore() {
   const noteStore = new NotesStore({
     ids: [],
     all: new Map<string, Note>(),
     isLoaded: false,
     isError: false,
-    userId,
   });
 
   return noteStore;
