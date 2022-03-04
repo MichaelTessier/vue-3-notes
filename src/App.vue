@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
+import { useAuthStore } from "@/domains/auth/composables/useAuthStore";
 import UserMenu from "@/domains/auth/components/UserMenu.vue";
 import AuthMenu from "@/domains/auth/components/AuthMenu.vue";
-import { useAuthState } from "@/domains/auth/use/useAuthState";
 
-const { isAuthenticated } = useAuthState();
+const authStore = useAuthStore();
 </script>
 
 <template>
@@ -27,8 +27,8 @@ const { isAuthenticated } = useAuthState();
       </RouterLink>
     </nav>
 
-    <UserMenu v-if="isAuthenticated" />
-    <AuthMenu v-if="!isAuthenticated" />
+    <UserMenu v-if="authStore.isAuthenticated()" />
+    <AuthMenu v-else />
   </header>
   <RouterView />
 </template>

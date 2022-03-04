@@ -1,24 +1,13 @@
 <script setup lang="ts">
-import { getAuth, signOut } from "firebase/auth";
-import { useAuthState } from "@/domains/auth/use/useAuthState";
-
-const { user } = useAuthState();
-
-const auth = getAuth();
-
-const userLogout = async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    alert(error);
-  }
-};
+import { useAuthStore } from "@/domains/auth/composables/useAuthStore";
+const authStore = useAuthStore();
 </script>
 
 <template>
   <nav>
-    <div v-if="user">{{ user.email }}</div>
-    <div @click="userLogout">Sign out</div>
-
+    <div v-if="authStore.isAuthenticated()">
+      {{ authStore.state.user?.email }}
+    </div>
+    <div @click="authStore.logout()">Sign out</div>
   </nav>
 </template>

@@ -23,18 +23,18 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/domains/auth/composables/useAuthStore";
+
+const router = useRouter();
+const authStore = useAuthStore();
 
 const email = ref("");
 const password = ref("");
 
-const router = useRouter();
-const auth = getAuth();
-
 const submit = async (): Promise<void> => {
   try {
-    await createUserWithEmailAndPassword(auth, email.value, password.value);
+    await authStore.register(email.value, password.value);
 
     router.push({
       name: "home",
