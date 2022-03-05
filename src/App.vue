@@ -27,7 +27,7 @@ const authStore = useAuthStore();
       </RouterLink>
     </nav>
 
-    <UserMenu v-if="authStore.isAuthenticated()" />
+    <UserMenu v-if="authStore.state.isAuthenticated" />
     <AuthMenu v-else />
   </header>
   <RouterView />

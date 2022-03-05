@@ -1,14 +1,15 @@
-import { reactive } from "vue";
+import { inject, reactive, readonly, type App } from "vue";
 
 import {
   getAuth,
   onAuthStateChanged,
-  type Unsubscribe,
   type User,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
+
+const authStoreSymbol = "authStore";
 
 interface AuthStoreState {
   user: User | null;
@@ -26,11 +27,16 @@ export class AuthStore {
       isAuthenticated: false,
     });
 
-    this.unsubscribe();
+    this.userFetch();
   }
 
-  isAuthenticated() {
-    return !!this.state.user;
+  install(app: App) {
+    app.provide(authStoreSymbol, this);
+  }
+
+  async getState() {
+    await this.userFetch();
+    return readonly(this.state);
   }
 
   async login(email: string, password: string) {
@@ -45,15 +51,30 @@ export class AuthStore {
     await signOut(getAuth());
   }
 
-  private unsubscribe: Unsubscribe = () => {
-    onAuthStateChanged(
-      getAuth(),
-      (user) => (this.state.user = user),
-      (error) => (this.state.error = error)
-    );
-  };
+  userFetch() {
+    return new Promise((resolve, reject) => {
+      onAuthStateChanged(
+        getAuth(),
+        (user) => {
+          this.state.user = user;
+          this.state.isAuthenticated = !!user;
+          resolve(user);
+        },
+        (error) => {
+          this.state.error = error;
+          reject(error);
+        }
+      );
+    });
+  }
 }
 
-export const useAuthStore = () => {
-  return new AuthStore();
+export const useAuthStore = (): AuthStore => {
+  const authStore = inject<AuthStore>(authStoreSymbol);
+
+  if (!authStore) {
+    throw new Error("authStore must be provide");
+  }
+
+  return authStore;
 };

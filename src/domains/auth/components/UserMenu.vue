@@ -5,7 +5,7 @@ const authStore = useAuthStore();
 
 <template>
   <nav>
-    <div v-if="authStore.isAuthenticated()">
+    <div v-if="authStore.state.isAuthenticated">
       {{ authStore.state.user?.email }}
     </div>
     <div @click="authStore.logout()">Sign out</div>
